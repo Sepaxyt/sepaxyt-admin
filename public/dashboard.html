@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SepaxYt Admin Panel — Dashboard</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+    body { background: #000814; font-family: 'Segoe UI', Tahoma, sans-serif; }
+    .glow { box-shadow: 0 0 30px rgba(0, 217, 255, 0.1); }
+    .sidebar-item:hover { background: rgba(0, 217, 255, 0.1); }
+    .sidebar-item.active { background: rgba(0, 217, 255, 0.15); border-left: 3px solid #00d9ff; }
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: #0a1929; }
+    ::-webkit-scrollbar-thumb { background: #1e3a5f; border-radius: 4px; }
+</style>
+</head>
+<body class="min-h-screen text-white">
+
+<nav class="bg-slate-900/90 backdrop-blur-md border-b border-cyan-500/20 px-4 py-3 flex items-center justify-between sticky top-0 z-40">
+    <div class="flex items-center gap-3">
+        <button id="menuBtn" class="text-cyan-400 text-2xl lg:hidden">☰</button>
+        <div class="px-3 py-1.5 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-md">
+            <span class="text-white font-bold text-sm tracking-wider">SEPAXYT</span>
+        </div>
+        <h1 class="hidden sm:block text-lg font-bold text-white">Admin Panel</h1>
+    </div>
+    <div class="flex items-center gap-3">
+        <span class="hidden sm:block text-sm text-slate-400">👤 Admin</span>
+        <button id="logoutBtn" class="px-3 py-1.5 bg-red-500/20 hover:bg-red-500/40 border border-red-500/50 text-red-300 rounded-md text-sm transition">
+            Logout
+        </button>
+    </div>
+</nav>
+
+<div class="flex">
+    <aside id="sidebar" class="hidden lg:block w-64 min-h-[calc(100vh-60px)] bg-slate-900/60 border-r border-cyan-500/10 fixed lg:sticky top-[60px] z-30">
+        <nav class="p-4 space-y-1">
+            <a href="#" class="sidebar-item active flex items-center gap-3 px-4 py-3 rounded-lg text-slate-300 hover:text-white transition" data-tab="dashboard">
+                <span class="text-xl">📊</span> Dashboard
+            </a>
+            <a href="#" class="sidebar-item flex items-center gap-3 px-4 py-3 rounded-lg text-slate-300 hover:text-white transition" data-tab="keys">
+                <span class="text-xl">🔑</span> Keys
+            </a>
+            <a href="#" class="sidebar-item flex items-center gap-3 px-4 py-3 rounded-lg text-slate-300 hover:text-white transition" data-tab="generate">
+                <span class="text-xl">✨</span> Generate Key
+            </a>
+            <a href="#" class="sidebar-item flex items-center gap-3 px-4 py-3 rounded-lg text-slate-300 hover:text-white transition" data-tab="devices">
+                <span class="text-xl">📱</span> Devices
+            </a>
+            <a href="#" class="sidebar-item flex items-center gap-3 px-4 py-3 rounded-lg text-slate-300 hover:text-white transition" data-tab="settings">
+                <span class="text-xl">⚙️</span> Settings
+            </a>
+        </nav>
+    </aside>
+
+    <main class="flex-1 p-4 lg:p-6 min-h-[calc(100vh-60px)]">
+
+        <!-- DASHBOARD -->
+        <section id="tab-dashboard" class="tab-content">
+            <h2 class="text-2xl font-bold mb-6 text-cyan-400">📊 Dashboard Overview</h2>
+
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                <div class="bg-slate-900/60 rounded-xl p-5 glow border border-cyan-500/20">
+                    <p class="text-slate-400 text-xs uppercase tracking-wider mb-1">Total Keys</p>
+                    <p id="statTotal" class="text-3xl font-bold text-white">-</p>
+                </div>
+                <div class="bg-slate-900/60 rounded-xl p-5 glow border border-green-500/20">
+                    <p class="text-slate-400 text-xs uppercase tracking-wider mb-1">Active</p>
+                    <p id="statActive" class="text-3xl font-bold text-green-400">-</p>
+                </div>
+                <div class="bg-slate-900/60 rounded-xl p-5 glow border border-red-500/20">
+                    <p class="text-slate-400 text-xs uppercase tracking-wider mb-1">Expired</p>
+                    <p id="statExpired" class="text-3xl font-bold text-red-400">-</p>
+                </div>
+                <div class="bg-slate-900/60 rounded-xl p-5 glow border border-cyan-500/20">
+                    <p class="text-slate-400 text-xs uppercase tracking-wider mb-1">Devices</p>
+                    <p id="statDevices" class="text-3xl font-bold text-cyan-400">-</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                <div class="bg-slate-900/40 rounded-xl p-4 border border-slate-700">
+                    <p class="text-slate-400 text-xs">Lifetime Keys</p>
+                    <p id="statLifetime" class="text-xl font-bold text-yellow-400">-</p>
+                </div>
+                <div class="bg-slate-900/40 rounded-xl p-4 border border-slate-700">
+                    <p class="text-slate-400 text-xs">Single Device</p>
+                    <p id="statSingle" class="text-xl font-bold text-blue-400">-</p>
+                </div>
+                <div class="bg-slate-900/40 rounded-xl p-4 border border-slate-700">
+                    <p class="text-slate-400 text-xs">Multi Device</p>
+                    <p id="statMulti" class="text-xl font-bold text-purple-400">-</p>
+                </div>
+                <div class="bg-slate-900/40 rounded-xl p-4 border border-slate-700">
+                    <p class="text-slate-400 text-xs">Disabled</p>
+                    <p id="statDisabled" class="text-xl font-bold text-orange-400">-</p>
+                </div>
+            </div>
+
+            <div class="bg-slate-900/60 rounded-xl p-5 glow border border-cyan-500/20">
+                <h3 class="text-cyan-400 font-bold mb-3">📈 Statistics</h3>
+                <canvas id="statsChart" height="80"></canvas>
+            </div>
+        </section>
+
+        <!-- KEYS -->
+        <section id="tab-keys" class="tab-content hidden">
+            <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
+                <h2 class="text-2xl font-bold text-cyan-400">🔑 All Keys</h2>
+                <div class="flex gap-2">
+                    <input type="text" id="searchKey" placeholder="🔍 Search..."
+                        class="px-3 py-2 bg-slate-800/70 border border-slate-700 rounded-lg text-white text-sm focus:outline-none focus:border-cyan-400">
+                    <button onclick="loadKeys()" class="px-4 py-2 bg-cyan-500/20 hover:bg-cyan-500/40 border border-cyan-500/50 text-cyan-300 rounded-lg text-sm">
+                        🔄
+                    </button>
+                </div>
+            </div>
+
+            <div class="bg-slate-900/60 rounded-xl glow border border-cyan-500/20 overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead class="bg-slate-800/80 border-b border-cyan-500/20">
+                            <tr>
+                                <th class="px-3 py-3 text-left text-cyan-400 font-semibold">KEY</th>
+                                <th class="px-3 py-3 text-left text-cyan-400 font-semibold">EXPIRY</th>
+                                <th class="px-3 py-3 text-center text-cyan-400 font-semibold">DEVICES</th>
+                                <th class="px-3 py-3 text-center text-cyan-400 font-semibold">STATUS</th>
+                                <th class="px-3 py-3 text-center text-cyan-400 font-semibold">ACTIONS</th>
+                            </tr>
+                        </thead>
+                        <tbody id="keysTable">
+                            <tr><td colspan="5" class="px-3 py-6 text-center text-slate-500">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- GENERATE -->
+        <section id="tab-generate" class="tab-content hidden">
+            <h2 class="text-2xl font-bold mb-6 text-cyan-400">✨ Generate New Key</h2>
+
+            <div class="max-w-2xl bg-slate-900/60 rounded-xl p-6 glow border border-cyan-500/20">
+                <div class="space-y-5">
+                    <div>
+                        <label class="block text-cyan-400 text-sm font-semibold mb-2">Key Type</label>
+                        <div class="flex gap-3">
+                            <label class="flex-1 cursor-pointer">
+                                <input type="radio" name="keyType" value="auto" checked class="hidden peer">
+                                <div class="px-4 py-3 bg-slate-800/70 border border-slate-700 rounded-lg text-center peer-checked:border-cyan-400 peer-checked:bg-cyan-500/10">
+                                    <p class="font-semibold">🤖 Auto</p>
+                                    <p class="text-xs text-slate-400 mt-1">SepaxYt-XXXX-XXXX</p>
+                                </div>
+                            </label>
+                            <label class="flex-1 cursor-pointer">
+                                <input type="radio" name="keyType" value="custom" class="hidden peer">
+                                <div class="px-4 py-3 bg-slate-800/70 border border-slate-700 rounded-lg text-center peer-checked:border-cyan-400 peer-checked:bg-cyan-500/10">
+                                    <p class="font-semibold">✏️ Custom</p>
+                                    <p class="text-xs text-slate-400 mt-1">Your own</p>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div id="customKeyDiv" class="hidden">
+                        <label class="block text-cyan-400 text-sm font-semibold mb-2">Custom Key</label>
+                        <input type="text" id="customKey" value="SepaxYt-"
+                            class="w-full px-4 py-3 bg-slate-800/70 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-cyan-400">
+                        <p class="text-xs text-slate-500 mt-1">Must start with "SepaxYt-"</p>
+                    </div>
+
+                    <div>
+                        <label class="block text-cyan-400 text-sm font-semibold mb-2">Duration</label>
+                        <select id="duration" class="w-full px-4 py-3 bg-slate-800/70 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-cyan-400">
+                            <option value="1">1 Day</option>
+                            <option value="7">7 Days</option>
+                            <option value="30" selected>30 Days</option>
+                            <option value="90">90 Days</option>
+                            <option value="365">1 Year</option>
+                            <option value="0">♾️ Lifetime</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-cyan-400 text-sm font-semibold mb-2">Device Limit</label>
+                        <select id="deviceLimit" class="w-full px-4 py-3 bg-slate-800/70 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-cyan-400">
+                            <option value="1" selected>1 Device</option>
+                            <option value="2">2 Devices</option>
+                            <option value="3">3 Devices</option>
+                            <option value="5">5 Devices</option>
+                            <option value="10">10 Devices</option>
+                            <option value="999">Unlimited</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-cyan-400 text-sm font-semibold mb-2">Note</label>
+                        <input type="text" id="note" placeholder="Optional"
+                            class="w-full px-4 py-3 bg-slate-800/70 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-cyan-400">
+                    </div>
+
+                    <button onclick="generateKey()"
+                        class="w-full py-3 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold rounded-lg hover:scale-[1.02] transition-all">
+                        ✨ GENERATE
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- DEVICES -->
+        <section id="tab-devices" class="tab-content hidden">
+            <h2 class="text-2xl font-bold mb-6 text-cyan-400">📱 Devices</h2>
+            <div class="bg-slate-900/60 rounded-xl p-5 glow border border-cyan-500/20 mb-4">
+                <label class="block text-cyan-400 text-sm font-semibold mb-2">Select Key</label>
+                <select id="deviceKeySelect" onchange="loadDevices()" class="w-full px-4 py-3 bg-slate-800/70 border border-slate-700 rounded-lg text-white">
+                    <option value="">-- Select --</option>
+                </select>
+            </div>
+            <div class="bg-slate-900/60 rounded-xl glow border border-cyan-500/20 overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead class="bg-slate-800/80 border-b border-cyan-500/20">
+                            <tr>
+                                <th class="px-3 py-3 text-left text-cyan-400 font-semibold">UUID</th>
+                                <th class="px-3 py-3 text-left text-cyan-400 font-semibold">FIRST LOGIN</th>
+                                <th class="px-3 py-3 text-left text-cyan-400 font-semibold">LAST LOGIN</th>
+                            </tr>
+                        </thead>
+                        <tbody id="devicesTable">
+                            <tr><td colspan="3" class="px-3 py-6 text-center text-slate-500">Select a key</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- SETTINGS -->
+        <section id="tab-settings" class="tab-content hidden">
+            <h2 class="text-2xl font-bold mb-6 text-cyan-400">⚙️ Settings</h2>
+            <div class="bg-slate-900/60 rounded-xl p-6 glow border border-cyan-500/20">
+                <h3 class="font-bold mb-4">System Info</h3>
+                <div class="space-y-2 text-sm text-slate-300">
+                    <p>🖥️ <strong>Panel:</strong> SepaxYt v1.0</p>
+                    <p>👤 <strong>Admin:</strong> SepaxYt</p>
+                    <p>🌐 <strong>Server:</strong> Vercel</p>
+                    <p>💾 <strong>Database:</strong> Upstash Redis</p>
+                </div>
+                <hr class="my-6 border-slate-700">
+                <button onclick="logout()" class="px-4 py-2 bg-red-500/20 hover:bg-red-500/40 border border-red-500/50 text-red-300 rounded-lg">
+                    🚪 Logout
+                </button>
+            </div>
+        </section>
+    </main>
+</div>
+
+<script>
+const token = localStorage.getItem('sepaxyt_token');
+if (!token) window.location.href = '/';
+
+function authHeaders() {
+    return { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token };
+}
+
+function logout() {
+    localStorage.removeItem('sepaxyt_token');
+    window.location.href = '/';
+}
+document.getElementById('logoutBtn').addEventListener('click', logout);
+
+document.querySelectorAll('.sidebar-item').forEach(item => {
+    item.addEventListener('click', (e) => {
+        e.preventDefault();
+        document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
+        item.classList.add('active');
+        const tab = item.dataset.tab;
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
+        document.getElementById('tab-' + tab).classList.remove('hidden');
+        if (tab === 'dashboard') loadStats();
+        if (tab === 'keys') loadKeys();
+        if (tab === 'devices') populateDeviceSelect();
+        if (window.innerWidth < 1024) document.getElementById('sidebar').classList.add('hidden');
+    });
+});
+
+document.getElementById('menuBtn').addEventListener('click', () => {
+    document.getElementById('sidebar').classList.toggle('hidden');
+});
+
+async function loadStats() {
+    try {
+        const res = await fetch('/api/stats', { headers: authHeaders() });
+        const data = await res.json();
+        if (!data.success) return;
+        const s = data.stats;
+        document.getElementById('statTotal').textContent = s.total;
+        document.getElementById('statActive').textContent = s.active;
+        document.getElementById('statExpired').textContent = s.expired;
+        document.getElementById('statDevices').textContent = s.totalDevices;
+        document.getElementById('statLifetime').textContent = s.lifetime;
+        document.getElementById('statSingle').textContent = s.singleDevice;
+        document.getElementById('statMulti').textContent = s.multiDevice;
+        document.getElementById('statDisabled').textContent = s.disabled;
+
+        if (window.statsChart) window.statsChart.destroy();
+        const ctx = document.getElementById('statsChart').getContext('2d');
+        window.statsChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Active', 'Expired', 'Lifetime', 'Disabled'],
+                datasets: [{
+                    data: [s.active, s.expired, s.lifetime, s.disabled],
+                    backgroundColor: ['#22c55e', '#ef4444', '#eab308', '#f97316'],
+                    borderRadius: 6,
+                }]
+            },
+            options: {
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94a3b8' } },
+                    x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
+                }
+            }
+        });
+    } catch (e) { console.error(e); }
+}
+
+async function loadKeys() {
+    const tbody = document.getElementById('keysTable');
+    tbody.innerHTML = '<tr><td colspan="5" class="px-3 py-6 text-center text-slate-500">Loading...</td></tr>';
+    try {
+        const res = await fetch('/api/keys?action=list', { headers: authHeaders() });
+        const data = await res.json();
+        if (!data.success) { tbody.innerHTML = '<tr><td colspan="5" class="text-center text-red-400 py-6">Error</td></tr>'; return; }
+
+        const search = (document.getElementById('searchKey').value || '').toLowerCase();
+        const keys = data.keys.filter(k => k.key.toLowerCase().includes(search));
+
+        if (keys.length === 0) { tbody.innerHTML = '<tr><td colspan="5" class="text-center text-slate-500 py-6">No keys</td></tr>'; return; }
+
+        const now = new Date();
+        tbody.innerHTML = keys.map(k => {
+            const isExpired = k.expiry !== '2099-12-31' && new Date(k.expiry) < now;
+            const isLifetime = k.expiry === '2099-12-31';
+            let status = '<span class="px-2 py-1 bg-green-500/20 text-green-400 rounded text-xs">✅ ACTIVE</span>';
+            if (k.disabled) status = '<span class="px-2 py-1 bg-orange-500/20 text-orange-400 rounded text-xs">⏸️ DISABLED</span>';
+            else if (isExpired) status = '<span class="px-2 py-1 bg-red-500/20 text-red-400 rounded text-xs">❌ EXPIRED</span>';
+            else if (isLifetime) status = '<span class="px-2 py-1 bg-yellow-500/20 text-yellow-400 rounded text-xs">♾️ LIFE</span>';
+
+            return `<tr class="border-b border-slate-800 hover:bg-slate-800/40">
+                <td class="px-3 py-3 font-mono text-cyan-300 text-xs">${k.key}</td>
+                <td class="px-3 py-3 text-xs">${isLifetime ? '∞' : k.expiry}</td>
+                <td class="px-3 py-3 text-center text-xs"><span class="px-2 py-1 bg-blue-500/20 text-blue-300 rounded">${k.deviceCount}/${k.deviceLimit === 999 ? '∞' : k.deviceLimit}</span></td>
+                <td class="px-3 py-3 text-center">${status}</td>
+                <td class="px-3 py-3 text-center">
+                    <div class="flex gap-1 justify-center flex-wrap">
+                        <button onclick="copyKey('${k.key}')" class="px-2 py-1 bg-cyan-500/20 text-cyan-300 rounded text-xs">📋</button>
+                        <button onclick="toggleKey('${k.key}', ${!k.disabled})" class="px-2 py-1 bg-yellow-500/20 text-yellow-300 rounded text-xs">${k.disabled ? '▶️' : '⏸️'}</button>
+                        <button onclick="resetDevices('${k.key}')" class="px-2 py-1 bg-purple-500/20 text-purple-300 rounded text-xs">🔄</button>
+                        <button onclick="deleteKey('${k.key}')" class="px-2 py-1 bg-red-500/20 text-red-300 rounded text-xs">🗑️</button>
+                    </div>
+                </td>
+            </tr>`;
+        }).join('');
+    } catch (e) {
+        tbody.innerHTML = '<tr><td colspan="5" class="text-red-400 text-center py-6">' + e.message + '</td></tr>';
+    }
+}
+document.getElementById('searchKey').addEventListener('input', loadKeys);
+
+document.querySelectorAll('input[name="keyType"]').forEach(r => {
+    r.addEventListener('change', (e) => {
+        document.getElementById('customKeyDiv').classList.toggle('hidden', e.target.value !== 'custom');
+    });
+});
+
+async function generateKey() {
+    const keyType = document.querySelector('input[name="keyType"]:checked').value;
+    const customKey = document.getElementById('customKey').value;
+    const duration = document.getElementById('duration').value;
+    const deviceLimit = document.getElementById('deviceLimit').value;
+    const note = document.getElementById('note').value;
+
+    const body = { action: 'create', duration: parseInt(duration), deviceLimit: parseInt(deviceLimit), note };
+    if (keyType === 'custom') body.customKey = customKey;
+
+    try {
+        const res = await fetch('/api/keys', { method: 'POST', headers: authHeaders(), body: JSON.stringify(body) });
+        const data = await res.json();
+        if (data.success) {
+            alert(`✅ Key Generated!\n\nKey: ${data.key.key}\nExpiry: ${data.key.expiry === '2099-12-31' ? 'Lifetime' : data.key.expiry}\nDevices: ${data.key.deviceLimit === 999 ? 'Unlimited' : data.key.deviceLimit}`);
+            document.getElementById('note').value = '';
+        } else {
+            alert('❌ ' + data.reason);
+        }
+    } catch (e) { alert('❌ ' + e.message); }
+}
+
+function copyKey(key) {
+    navigator.clipboard.writeText(key);
+    alert('📋 Copied: ' + key);
+}
+
+async function deleteKey(key) {
+    if (!confirm(`Delete ${key}?`)) return;
+    const res = await fetch('/api/keys', { method: 'POST', headers: authHeaders(), body: JSON.stringify({ action: 'delete', key }) });
+    const data = await res.json();
+    if (data.success) { alert('✅ Deleted'); loadKeys(); }
+    else alert('❌ ' + data.reason);
+}
+
+async function toggleKey(key, disabled) {
+    const res = await fetch('/api/keys', { method: 'POST', headers: authHeaders(), body: JSON.stringify({ action: 'toggle', key, disabled }) });
+    const data = await res.json();
+    if (data.success) loadKeys();
+}
+
+async function resetDevices(key) {
+    if (!confirm(`Reset all devices for ${key}?`)) return;
+    const res = await fetch('/api/keys', { method: 'POST', headers: authHeaders(), body: JSON.stringify({ action: 'resetDevices', key }) });
+    const data = await res.json();
+    if (data.success) { alert('✅ Reset'); loadKeys(); }
+}
+
+async function populateDeviceSelect() {
+    const res = await fetch('/api/keys?action=list', { headers: authHeaders() });
+    const data = await res.json();
+    if (!data.success) return;
+    const select = document.getElementById('deviceKeySelect');
+    select.innerHTML = '<option value="">-- Select --</option>' +
+        data.keys.map(k => `<option value="${k.key}">${k.key} (${k.deviceCount}/${k.deviceLimit === 999 ? '∞' : k.deviceLimit})</option>`).join('');
+}
+
+async function loadDevices() {
+    const key = document.getElementById('deviceKeySelect').value;
+    const tbody = document.getElementById('devicesTable');
+    if (!key) { tbody.innerHTML = '<tr><td colspan="3" class="text-center text-slate-500 py-6">Select a key</td></tr>'; return; }
+
+    tbody.innerHTML = '<tr><td colspan="3" class="text-center text-slate-500 py-6">Loading...</td></tr>';
+    const res = await fetch('/api/devices?key=' + encodeURIComponent(key), { headers: authHeaders() });
+    const data = await res.json();
+
+    if (!data.success || !data.devices || data.devices.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="3" class="text-center text-slate-500 py-6">No devices</td></tr>';
+        return;
+    }
+
+    tbody.innerHTML = data.devices.map(d => `
+        <tr class="border-b border-slate-800">
+            <td class="px-3 py-3 font-mono text-xs text-cyan-300">${d.uuid}</td>
+            <td class="px-3 py-3 text-xs">${new Date(d.firstLogin).toLocaleString()}</td>
+            <td class="px-3 py-3 text-xs">${new Date(d.lastLogin).toLocaleString()}</td>
+        </tr>
+    `).join('');
+}
+
+loadStats();
+</script>
+
+</body>
+</html>
