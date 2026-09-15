@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "rewrites": [
+    { "source": "/connect",     "destination": "/api/connect" },
+    { "source": "/api/auth",    "destination": "/api/auth" },
+    { "source": "/api/keys",    "destination": "/api/keys" },
+    { "source": "/api/stats",   "destination": "/api/stats" },
+    { "source": "/api/devices", "destination": "/api/devices" }
+  ]
+}
